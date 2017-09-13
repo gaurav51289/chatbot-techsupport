@@ -1,12 +1,17 @@
 EN_WHITELIST = '0123456789abcdefghijklmnopqrstuvwxyz ' # space is included in whitelist
 EN_BLACKLIST = '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~\''
 
-FILENAME = 'data/chat.txt'
+FILENAME = 'data/train.txt'
+
+READ_TRAIN_FILE='train.csv'
+TRAIN_OUTPUT="./data/train.txt"
+TEST_OUTPUT="./data/test.txt"
+READ_TEST_FILE='test.csv'
 
 limit = {
-        'maxq' : 60,
+        'maxq' : 100,
         'minq' : 0,
-        'maxa' : 60,
+        'maxa' : 100,
         'mina' : 3
         }
 
@@ -15,6 +20,7 @@ VOCAB_SIZE = 6000
 
 import random
 import sys
+import csv
 
 import nltk
 import itertools
@@ -146,6 +152,9 @@ def pad_seq(seq, lookup, maxlen):
 
 def process_data():
 
+    readCSV(READ_TRAIN_FILE,TRAIN_OUTPUT)
+    readCSV(READ_TEST_FILE,TEST_OUTPUT)
+
     print('\n>> Read lines from file')
     lines = read_lines(filename=FILENAME)
 
@@ -209,6 +218,18 @@ def load_data(PATH=''):
     idx_a = np.load(PATH + 'idx_a.npy')
     return metadata, idx_q, idx_a
 
+def readCSV(filename,output_filename):
+    file = open(output_filename, "w")
+    with open(filename, 'rt') as csvfile:
+        spamreader = csv.reader(csvfile, delimiter=',')
+        for row in spamreader:
+            file.write(row[0].replace(" __eot__","").replace(" __eou__",""))
+            file.write('\n')
+            file.write(row[1].replace(" __eot__","").replace(" __eou__",""))
+            file.write('\n')
+    print("End")
+    file.close()
 
 if __name__ == '__main__':
     process_data()
+
